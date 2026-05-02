@@ -9,11 +9,826 @@
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: Helvetica, sans-serif; background: #faf9f7; color: #1a1a1a; }
+    body { font-family: Helvetica, sans-serif; background: #faf9f7; color: #1a1a1a; min-height: 100vh; }
   </style>
 </head>
 <body>
   <div id="root"></div>
-  <script type="text/babel" src="App.jsx"></script>
+  <script type="text/babel">
+    const { useState } = React;
+const PROFESIONES = [
+  {
+    id: "contador",
+    emoji: "📊",
+    nombre: "Contador / Finanzas",
+    categoria: "Negocios",
+    color: "#1a1a1a",
+    accent: "#C9A84C",
+    nichos: [
+      { label: "Educación financiera personal", desc: "Cómo declarar impuestos, ahorrar y no perder dinero — para personas comunes" },
+      { label: "Finanzas para emprendedores", desc: "Flujo de caja, nómina, estructura legal para dueños de negocio" },
+      { label: "Inversión accesible", desc: "Portafolios básicos, ETFs, bienes raíces — sin tecnicismos" },
+    ]
+  },
+  {
+    id: "secretaria",
+    emoji: "🗂️",
+    nombre: "Secretaria / Asistente",
+    categoria: "Negocios",
+    color: "#1a1a1a",
+    accent: "#7B8FA1",
+    nichos: [
+      { label: "Productividad y organización", desc: "Herramientas, templates, sistemas para organizar trabajo y vida" },
+      { label: "Carrera administrativa", desc: "Cómo crecer, ganar más y convertirse en asistente ejecutiva o COO" },
+      { label: "IA para oficina", desc: "ChatGPT, Notion AI, automatizaciones para hacer más en menos tiempo" },
+    ]
+  },
+  {
+    id: "admin",
+    emoji: "🏢",
+    nombre: "Administración de empresas",
+    categoria: "Negocios",
+    color: "#1a1a1a",
+    accent: "#4A7C59",
+    nichos: [
+      { label: "Gestión de negocios locales", desc: "Cómo administrar pymes, procesos, equipos y operaciones" },
+      { label: "Emprendimiento desde cero", desc: "Validar ideas, lanzar, escalar — sin necesitar MBA" },
+      { label: "Liderazgo y management", desc: "Cómo liderar equipos, tomar decisiones y construir cultura" },
+    ]
+  },
+  {
+    id: "arquitectura",
+    emoji: "🏗️",
+    nombre: "Arquitectura",
+    categoria: "Creativo / Diseño",
+    color: "#1a1a1a",
+    accent: "#C9A84C",
+    nichos: [
+      { label: "Tours de proyectos", desc: "Antes/después de obras — uno de los contenidos más virales de arquitectura" },
+      { label: "Arquitectura accesible", desc: "Diseño funcional para casas pequeñas, presupuestos reales, soluciones prácticas" },
+      { label: "Proceso creativo", desc: "Detrás del diseño: planos, renders, materiales — educa y genera confianza" },
+    ]
+  },
+  {
+    id: "interiores",
+    emoji: "🛋️",
+    nombre: "Diseño de interiores",
+    categoria: "Creativo / Diseño",
+    color: "#1a1a1a",
+    accent: "#A07850",
+    nichos: [
+      { label: "Decoración para departamentos pequeños", desc: "Trucos de espacio, colores, muebles multifunción — contenido altamente buscado" },
+      { label: "Tendencias de diseño", desc: "Paletas, estilos, materiales — posicionarte como referente estético" },
+      { label: "Transformaciones con bajo presupuesto", desc: "Antes/después con poco dinero — máximo engagement garantizado" },
+    ]
+  },
+  {
+    id: "ingcivil",
+    emoji: "🏛️",
+    nombre: "Ingeniería civil",
+    categoria: "Tecnología",
+    color: "#1a1a1a",
+    accent: "#6B8E9F",
+    nichos: [
+      { label: "Construcción para dueños de casa", desc: "Cómo no dejarse robar en una obra, qué preguntar al contratista" },
+      { label: "Errores de construcción", desc: "Fallas estructurales, malos materiales — contenido educativo con alto share" },
+      { label: "Infraestructura y ciudad", desc: "Explica proyectos urbanos, puentes, vías — posiciona como experto" },
+    ]
+  },
+  {
+    id: "sistemas",
+    emoji: "💻",
+    nombre: "Ingeniería en sistemas / TI",
+    categoria: "Tecnología",
+    color: "#1a1a1a",
+    accent: "#2D6A4F",
+    nichos: [
+      { label: "Aprender a programar", desc: "Tutoriales, roadmaps, lenguajes — nicho eterno con demanda masiva" },
+      { label: "IA y automatización", desc: "Herramientas, agentes, flujos — el nicho de mayor crecimiento actual" },
+      { label: "Freelance tech / carrera remota", desc: "Cómo ganar en dólares como dev desde LATAM" },
+    ]
+  },
+  {
+    id: "derecho",
+    emoji: "⚖️",
+    nombre: "Derecho / Leyes",
+    categoria: "Salud / Legal",
+    color: "#1a1a1a",
+    accent: "#8B6F47",
+    nichos: [
+      { label: "Derecho cotidiano simplificado", desc: "Tus derechos como empleado, inquilino, consumidor — lo que nadie te explica" },
+      { label: "Cómo no meterse en problemas legales", desc: "Contratos, socios, herencias — prevención jurídica para emprendedores" },
+      { label: "Casos reales y jurisprudencia", desc: "Storytelling legal — los casos más impactantes explicados para todos" },
+    ]
+  },
+  {
+    id: "medicina",
+    emoji: "🩺",
+    nombre: "Medicina / Salud",
+    categoria: "Salud / Legal",
+    color: "#1a1a1a",
+    accent: "#4A7C59",
+    nichos: [
+      { label: "Salud preventiva", desc: "Hábitos, chequeos, señales de alerta — audiencia masiva y evergreen" },
+      { label: "Desmitificación médica", desc: "Destruir mitos virales — contenido de alto share y posicionamiento de autoridad" },
+      { label: "Especialidad enfocada", desc: "Dermatología, nutrición, salud mental — nichos específicos con audiencias fieles" },
+    ]
+  },
+  {
+    id: "comunicacion",
+    emoji: "📡",
+    nombre: "Comunicación / Periodismo",
+    categoria: "Creativo / Diseño",
+    color: "#1a1a1a",
+    accent: "#7B6E9F",
+    nichos: [
+      { label: "Marca personal y storytelling", desc: "Cómo comunicar mejor, hablar en público, construir tu narrativa" },
+      { label: "Medios y análisis de noticias", desc: "Explicar la actualidad con contexto — periodismo que educa y fideliza" },
+      { label: "Comunicación para empresas", desc: "Relaciones públicas, crisis, mensajes corporativos — B2B de alto valor" },
+    ]
+  },
+  {
+    id: "marketing",
+    emoji: "📣",
+    nombre: "Marketing",
+    categoria: "Negocios",
+    color: "#1a1a1a",
+    accent: "#C9A84C",
+    nichos: [
+      { label: "Marketing para pequeños negocios", desc: "Estrategias reales con presupuesto limitado — la audiencia más hambrienta de LATAM" },
+      { label: "Resultados y casos reales", desc: "Mostrar métricas, antes/después de campañas — genera autoridad y atrae clientes" },
+      { label: "Tendencias digitales", desc: "Algoritmos, plataformas, herramientas nuevas — posicionarte como referente" },
+    ]
+  },
+  {
+    id: "psicologia",
+    emoji: "🧠",
+    nombre: "Psicología / Coaching",
+    categoria: "Salud / Legal",
+    color: "#1a1a1a",
+    accent: "#9B7FA6",
+    nichos: [
+      { label: "Salud mental accesible", desc: "Ansiedad, límites, autoestima — contenido de altísimo consumo y retención" },
+      { label: "Relaciones y comunicación", desc: "Vínculos tóxicos, apego, comunicación asertiva — viral garantizado" },
+      { label: "Alto rendimiento personal", desc: "Hábitos, disciplina, mentalidad — audiencia de emprendedores y profesionales" },
+    ]
+  },
+  {
+    id: "nutricion",
+    emoji: "🥗",
+    nombre: "Nutrición / Dietética",
+    categoria: "Salud / Legal",
+    color: "#1a1a1a",
+    accent: "#5A8A5A",
+    nichos: [
+      { label: "Alimentación sin dieta", desc: "Comer bien sin restricciones extremas — el mensaje que todos quieren escuchar" },
+      { label: "Nutrición para emprendedores", desc: "Energía, rendimiento cognitivo, hábitos alimenticios para quienes trabajan duro" },
+      { label: "Mitos alimenticios destruidos", desc: "Verdades incómodas sobre lo que comes — contenido de altísimo share" },
+    ]
+  },
+];
+
+function buildPrompt(prof, nicho, contentType, pillar, topic) {
+  return `Eres el mejor estratega de contenido viral del mundo para Latinoamérica.
+Tu misión: crear guiones que generen atención inmediata, retención, comentarios, shares y ventas.
+
+PERFIL DEL CREADOR:
+Profesión: ${prof.nombre}
+Nicho elegido: ${nicho.label} — ${nicho.desc}
+Categoría: ${prof.categoria}
+
+ESTILO — RYAN SERHANT:
+- Autoridad aspiracional desde la experiencia real
+- Storytelling en primera persona con momentos concretos
+- Frases cortas. Golpe a golpe. Sin relleno.
+- Contraste entre el antes (ignorancia/problema) y el después (conocimiento/solución)
+- Nunca suena a vendedor. Suena a quien ya sabe y te muestra lo que nadie te dijo.
+
+EJE CENTRAL: "No es talento. Es sistema." — siempre debe sentirse.
+
+FORMATO — devuelve EXACTAMENTE este JSON sin texto extra ni backticks markdown:
+{"hook":"...","guion":"...","vision_visual":"...","carrusel":["slide1","slide2","slide3","slide4","slide5","slide6"],"caption":"..."}
+
+REGLAS:
+- Guion: máximo 40 segundos en voz alta. Hook → Body → Remate → CTA
+- CTA siempre termina con: comenta SISTEMA
+- Caption: emocional, storytelling corto, CTA + hashtags relevantes a la profesión
+- Español latinoamericano, sin vos/che, directo y aspiracional
+- El contenido debe hacer pensar: "Esto nunca lo había visto así"
+
+TEMA A DESARROLLAR: ${topic}
+TIPO DE CONTENIDO: ${contentType}
+PILAR: ${pillar}`;
+}
+
+const S = {
+  page: {
+    background: "#FAFAF8",
+    minHeight: "100vh",
+    fontFamily: "'Georgia', 'Times New Roman', serif",
+    color: "#1a1a1a",
+    paddingBottom: 80,
+  },
+  nav: {
+    background: "#fff",
+    borderBottom: "1px solid #E8E4DE",
+    padding: "0 32px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    height: 56,
+    position: "sticky",
+    top: 0,
+    zIndex: 100,
+  },
+  navBrand: {
+    fontFamily: "'Georgia', serif",
+    fontSize: 13,
+    fontWeight: 400,
+    letterSpacing: 4,
+    textTransform: "uppercase",
+    color: "#1a1a1a",
+  },
+  navTag: {
+    fontSize: 9,
+    letterSpacing: 3,
+    textTransform: "uppercase",
+    color: "#999",
+    fontFamily: "Helvetica, sans-serif",
+  },
+  hero: {
+    background: "#fff",
+    borderBottom: "1px solid #E8E4DE",
+    padding: "72px 32px 64px",
+    textAlign: "center",
+  },
+  heroEyebrow: {
+    fontSize: 10,
+    letterSpacing: 5,
+    textTransform: "uppercase",
+    color: "#999",
+    marginBottom: 24,
+    fontFamily: "Helvetica, sans-serif",
+    fontWeight: 400,
+  },
+  heroTitle: {
+    fontSize: "clamp(36px, 6vw, 72px)",
+    fontWeight: 400,
+    lineHeight: 1.05,
+    letterSpacing: -1,
+    color: "#1a1a1a",
+    marginBottom: 20,
+    maxWidth: 700,
+    margin: "0 auto 20px",
+  },
+  heroSub: {
+    fontSize: 15,
+    color: "#777",
+    letterSpacing: 0.3,
+    fontFamily: "Helvetica, sans-serif",
+    fontWeight: 300,
+    maxWidth: 520,
+    margin: "0 auto 0",
+    lineHeight: 1.6,
+  },
+  wrap: { maxWidth: 960, margin: "0 auto", padding: "0 24px" },
+  apiRow: {
+    background: "#fff",
+    border: "1px solid #E8E4DE",
+    padding: "20px 28px",
+    marginBottom: 2,
+    display: "flex",
+    alignItems: "center",
+    gap: 16,
+    flexWrap: "wrap",
+  },
+  apiLabel: { fontSize: 9, letterSpacing: 3, textTransform: "uppercase", color: "#999", whiteSpace: "nowrap", fontFamily: "Helvetica, sans-serif" },
+  apiInput: {
+    flex: 1, minWidth: 200,
+    background: "#FAFAF8",
+    border: "1px solid #E8E4DE",
+    color: "#1a1a1a",
+    fontFamily: "monospace",
+    fontSize: 12,
+    padding: "10px 14px",
+    outline: "none",
+  },
+  apiOk: { fontSize: 9, letterSpacing: 2, color: "#4A7C59", textTransform: "uppercase", fontFamily: "Helvetica, sans-serif", fontWeight: 700, whiteSpace: "nowrap" },
+  apiNo: { fontSize: 9, letterSpacing: 2, color: "#bbb", textTransform: "uppercase", fontFamily: "Helvetica, sans-serif", fontWeight: 700, whiteSpace: "nowrap" },
+  sectionTitle: {
+    fontSize: 10, letterSpacing: 4, textTransform: "uppercase",
+    color: "#999", fontFamily: "Helvetica, sans-serif",
+    fontWeight: 400, marginBottom: 16, display: "block",
+    paddingTop: 40, paddingBottom: 0,
+  },
+  profGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))",
+    gap: 2,
+    marginBottom: 2,
+  },
+  profCard: (active, accent) => ({
+    background: active ? "#1a1a1a" : "#fff",
+    border: "1px solid #E8E4DE",
+    padding: "20px 20px",
+    cursor: "pointer",
+    transition: "all 0.15s",
+    borderLeft: active ? `3px solid ${accent}` : "3px solid transparent",
+  }),
+  profEmoji: { fontSize: 20, marginBottom: 8, display: "block" },
+  profName: (active) => ({
+    fontFamily: "Helvetica, sans-serif",
+    fontSize: 13,
+    fontWeight: 600,
+    color: active ? "#fff" : "#1a1a1a",
+    marginBottom: 3,
+    letterSpacing: 0,
+  }),
+  profCat: (active) => ({
+    fontSize: 9, letterSpacing: 2, textTransform: "uppercase",
+    color: active ? "#aaa" : "#bbb", fontFamily: "Helvetica, sans-serif",
+  }),
+  nichoGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(3, 1fr)",
+    gap: 2,
+    marginBottom: 2,
+  },
+  nichoCard: (active, accent) => ({
+    background: active ? accent : "#fff",
+    border: `1px solid ${active ? accent : "#E8E4DE"}`,
+    padding: "16px 18px",
+    cursor: "pointer",
+    transition: "all 0.15s",
+  }),
+  nichoLabel: (active) => ({
+    fontFamily: "Helvetica, sans-serif",
+    fontSize: 12,
+    fontWeight: 600,
+    color: active ? "#fff" : "#1a1a1a",
+    marginBottom: 5,
+    letterSpacing: 0,
+  }),
+  nichoDesc: (active) => ({
+    fontSize: 10,
+    color: active ? "rgba(255,255,255,0.75)" : "#999",
+    lineHeight: 1.5,
+    fontFamily: "Helvetica, sans-serif",
+    fontWeight: 300,
+  }),
+  formPanel: {
+    background: "#fff",
+    border: "1px solid #E8E4DE",
+    padding: "32px 32px 28px",
+    marginBottom: 2,
+  },
+  formGrid2: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 12 },
+  label: {
+    fontSize: 9, letterSpacing: 3, textTransform: "uppercase",
+    color: "#999", fontFamily: "Helvetica, sans-serif", marginBottom: 8, display: "block",
+  },
+  select: {
+    width: "100%", background: "#FAFAF8", border: "1px solid #E8E4DE",
+    color: "#1a1a1a", fontFamily: "Helvetica, sans-serif", fontSize: 13,
+    padding: "11px 14px", outline: "none", cursor: "pointer",
+  },
+  topicInput: {
+    width: "100%", background: "#FAFAF8", border: "1px solid #E8E4DE",
+    color: "#1a1a1a", fontFamily: "Helvetica, sans-serif", fontSize: 13,
+    padding: "11px 14px", outline: "none", marginBottom: 24,
+  },
+  genBtn: (loading) => ({
+    width: "100%",
+    background: loading ? "#e8e4de" : "#1a1a1a",
+    border: "none",
+    color: loading ? "#aaa" : "#fff",
+    fontFamily: "Helvetica, sans-serif",
+    fontSize: 11,
+    fontWeight: 700,
+    letterSpacing: 4,
+    textTransform: "uppercase",
+    padding: "18px",
+    cursor: loading ? "not-allowed" : "pointer",
+    transition: "all 0.2s",
+  }),
+  loadBar: {
+    height: 1,
+    background: "linear-gradient(90deg, #C9A84C, #1a1a1a, #C9A84C)",
+    backgroundSize: "200% 100%",
+    marginTop: 16,
+    animation: "shimmer 1.5s linear infinite",
+  },
+  errBox: {
+    background: "#FFF5F5",
+    border: "1px solid #F5C6C6",
+    padding: "12px 16px",
+    marginTop: 12,
+    fontSize: 12,
+    color: "#C0392B",
+    fontFamily: "Helvetica, sans-serif",
+  },
+  outputWrap: { marginTop: 40 },
+  outputTop: {
+    display: "flex", alignItems: "flex-start",
+    justifyContent: "space-between", marginBottom: 24,
+    borderBottom: "1px solid #E8E4DE", paddingBottom: 20,
+    flexWrap: "wrap", gap: 12,
+  },
+  outputHeadLeft: {},
+  outputEyebrow: { fontSize: 9, letterSpacing: 4, textTransform: "uppercase", color: "#999", fontFamily: "Helvetica, sans-serif", marginBottom: 6 },
+  outputTitle: { fontSize: 28, fontWeight: 400, letterSpacing: -0.5, color: "#1a1a1a" },
+  copyAllBtn: {
+    background: "transparent",
+    border: "1px solid #1a1a1a",
+    color: "#1a1a1a",
+    fontFamily: "Helvetica, sans-serif",
+    fontSize: 9, fontWeight: 700, letterSpacing: 3, textTransform: "uppercase",
+    padding: "10px 18px", cursor: "pointer", transition: "all 0.2s",
+  },
+  resultCard: {
+    background: "#fff",
+    border: "1px solid #E8E4DE",
+    marginBottom: 2,
+  },
+  cardTop: (open) => ({
+    display: "flex", alignItems: "center", justifyContent: "space-between",
+    padding: "16px 24px",
+    borderBottom: open ? "1px solid #E8E4DE" : "1px solid transparent",
+    cursor: "pointer", userSelect: "none",
+  }),
+  cardLeft: { display: "flex", alignItems: "center", gap: 14 },
+  cardNum: (accent) => ({
+    fontFamily: "Georgia, serif",
+    fontSize: 22,
+    color: accent,
+    lineHeight: 1,
+    minWidth: 28,
+    fontWeight: 400,
+  }),
+  cardTitle: {
+    fontFamily: "Helvetica, sans-serif",
+    fontSize: 10, fontWeight: 700, letterSpacing: 3, textTransform: "uppercase", color: "#1a1a1a",
+  },
+  cardActions: { display: "flex", alignItems: "center", gap: 8 },
+  cpyBtn: (copied) => ({
+    background: "transparent",
+    border: `1px solid ${copied ? "#4A7C59" : "#E8E4DE"}`,
+    color: copied ? "#4A7C59" : "#bbb",
+    fontFamily: "Helvetica, sans-serif",
+    fontSize: 9, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase",
+    padding: "5px 12px", cursor: "pointer", transition: "all 0.2s",
+  }),
+  chevron: (open) => ({
+    color: "#bbb", fontSize: 10,
+    transform: open ? "rotate(180deg)" : "rotate(0deg)",
+    transition: "transform 0.2s",
+  }),
+  cardBody: { padding: "24px 26px" },
+  cardText: {
+    fontSize: 14, lineHeight: 1.9, color: "#555",
+    whiteSpace: "pre-wrap", fontFamily: "Georgia, serif",
+    fontWeight: 400,
+  },
+  histWrap: { marginTop: 56, paddingTop: 32, borderTop: "1px solid #E8E4DE" },
+  histTop: { display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 },
+  histH: { fontFamily: "Georgia, serif", fontSize: 18, fontWeight: 400, letterSpacing: -0.3, color: "#888" },
+  clrBtn: {
+    background: "transparent", border: "1px solid #E8E4DE",
+    color: "#bbb", fontFamily: "Helvetica, sans-serif",
+    fontSize: 9, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase",
+    padding: "7px 14px", cursor: "pointer",
+  },
+  histItem: {
+    background: "#fff", border: "1px solid #E8E4DE",
+    padding: "13px 18px", display: "flex", alignItems: "center",
+    justifyContent: "space-between", cursor: "pointer", marginBottom: 2, gap: 12,
+    transition: "border-color 0.15s",
+  },
+  histLeft: { display: "flex", alignItems: "center", gap: 12, flex: 1, minWidth: 0 },
+  histBadge: (accent) => ({
+    fontSize: 9, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase",
+    padding: "3px 8px", border: `1px solid ${accent}`, color: accent,
+    whiteSpace: "nowrap", flexShrink: 0, fontFamily: "Helvetica, sans-serif",
+  }),
+  histTopic: {
+    fontSize: 12, color: "#888", overflow: "hidden", textOverflow: "ellipsis",
+    whiteSpace: "nowrap", fontFamily: "Helvetica, sans-serif",
+  },
+  histTime: { fontSize: 9, color: "#bbb", whiteSpace: "nowrap", fontFamily: "Helvetica, sans-serif" },
+  histEmpty: {
+    textAlign: "center", padding: "32px",
+    fontSize: 11, color: "#ccc",
+    border: "1px dashed #E8E4DE",
+    fontFamily: "Helvetica, sans-serif", letterSpacing: 1,
+  },
+  footer: {
+    marginTop: 80, borderTop: "1px solid #E8E4DE",
+    padding: "32px 32px",
+    textAlign: "center",
+  },
+  footerText: { fontSize: 9, letterSpacing: 4, color: "#ccc", textTransform: "uppercase", fontFamily: "Helvetica, sans-serif" },
+};
+
+function ResultCard({ num, title, content, accent }) {
+  const [open, setOpen] = React.useState(num === "01");
+  const [copied, setCopied] = React.useState(false);
+  const copy = (e) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(content).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  };
+  return (
+    <div style={S.resultCard}>
+      <div style={S.cardTop(open)} onClick={() => setOpen(!open)}>
+        <div style={S.cardLeft}>
+          <span style={S.cardNum(accent)}>{num}</span>
+          <span style={S.cardTitle}>{title}</span>
+        </div>
+        <div style={S.cardActions}>
+          <button style={S.cpyBtn(copied)} onClick={copy}>{copied ? "✓ Copiado" : "Copiar"}</button>
+          <span style={S.chevron(open)}>▼</span>
+        </div>
+      </div>
+      {open && (
+        <div style={S.cardBody}>
+          <p style={S.cardText}>{content}</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function App() {
+  const [apiKey, setApiKey] = React.useState("");
+  const [profId, setProfId] = React.useState(null);
+  const [nichoIdx, setNichoIdx] = React.useState(null);
+  const [topic, setTopic] = React.useState("");
+  const [contentType, setContentType] = React.useState("reel");
+  const [pillar, setPillar] = React.useState("atraccion");
+  const [loading, setLoading] = React.useState(false);
+  const [error, setError] = React.useState(null);
+  const [result, setResult] = React.useState(null);
+  const [resultMeta, setResultMeta] = React.useState(null);
+  const [historial, setHistorial] = React.useState([]);
+  const [copiedAll, setCopiedAll] = React.useState(false);
+
+  const apiValid = apiKey.startsWith("sk-ant-") && apiKey.length > 20;
+  const prof = PROFESIONES.find(p => p.id === profId);
+  const nicho = prof && nichoIdx !== null ? prof.nichos[nichoIdx] : null;
+
+  const selectProf = (id) => {
+    setProfId(id);
+    setNichoIdx(null);
+    setTopic("");
+    setResult(null);
+    setError(null);
+  };
+
+  const selectNicho = (idx) => {
+    setNichoIdx(idx);
+    const n = prof.nichos[idx];
+    setTopic(n.desc);
+  };
+
+  const generate = async () => {
+    if (!apiValid) { setError("Ingresa una API Key válida de Anthropic (sk-ant-...)"); return; }
+    if (!prof) { setError("Selecciona una profesión primero"); return; }
+    if (!nicho) { setError("Selecciona un nicho de contenido"); return; }
+    if (!topic.trim()) { setError("Escribe el tema a desarrollar"); return; }
+
+    setLoading(true); setError(null); setResult(null);
+
+    try {
+      const res = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": apiKey,
+          "anthropic-version": "2023-06-01",
+          "anthropic-dangerous-direct-browser-access": "true",
+        },
+        body: JSON.stringify({
+          model: "claude-sonnet-4-20250514",
+          max_tokens: 2000,
+          system: buildPrompt(prof, nicho, contentType, pillar, topic),
+          messages: [{ role: "user", content: `Genera el guión viral para: ${prof.nombre} — ${nicho.label}. Tema: ${topic}` }],
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error?.message || "Error en la API");
+      const raw = data.content[0].text.trim()
+        .replace(/^```json\s*/i, "").replace(/^```\s*/i, "").replace(/```\s*$/i, "").trim();
+      const parsed = JSON.parse(raw);
+      setResult(parsed);
+      const meta = { profId, nichoLabel: nicho.label, topic, contentType, pillar, accent: prof.accent };
+      setResultMeta(meta);
+
+      const entry = {
+        id: Date.now(),
+        profId, nichoLabel: nicho.label, topic, contentType, pillar,
+        accent: prof.accent, profNombre: prof.nombre,
+        data: parsed,
+        time: new Date().toLocaleTimeString("es", { hour: "2-digit", minute: "2-digit" }),
+        date: new Date().toLocaleDateString("es", { day: "2-digit", month: "short" }),
+      };
+      setHistorial(prev => [entry, ...prev].slice(0, 20));
+    } catch (err) {
+      setError(err.message || "Error inesperado. Intenta de nuevo.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadHist = (entry) => {
+    setProfId(entry.profId);
+    const p = PROFESIONES.find(x => x.id === entry.profId);
+    if (p) {
+      const idx = p.nichos.findIndex(n => n.label === entry.nichoLabel);
+      setNichoIdx(idx >= 0 ? idx : null);
+    }
+    setTopic(entry.topic);
+    setContentType(entry.contentType);
+    setPillar(entry.pillar);
+    setResult(entry.data);
+    setResultMeta({ profId: entry.profId, nichoLabel: entry.nichoLabel, accent: entry.accent });
+  };
+
+  const copyAll = () => {
+    if (!result) return;
+    const sections = [
+      ["HOOK VIRAL", result.hook],
+      ["GUIÓN DEL REEL", result.guion],
+      ["VISIÓN VISUAL", result.vision_visual],
+      ["VERSIÓN CARRUSEL", Array.isArray(result.carrusel) ? result.carrusel.map((s, i) => `SLIDE ${i + 1}:\n${s}`).join("\n\n") : result.carrusel],
+      ["CAPTION + CTA", result.caption],
+    ];
+    navigator.clipboard.writeText(sections.map(([k, v]) => `=== ${k} ===\n${v}`).join("\n\n")).then(() => {
+      setCopiedAll(true); setTimeout(() => setCopiedAll(false), 2000);
+    });
+  };
+
+  const accent = prof?.accent || "#C9A84C";
+
+  return (
+    <div style={S.page}>
+      <style>{`
+        @keyframes shimmer { 0%{background-position:-200% 0} 100%{background-position:200% 0} }
+        * { box-sizing: border-box; }
+        button:hover { opacity: 0.85; }
+        select option { background: #fff; }
+      `}</style>
+
+      <div style={S.nav}>
+        <span style={S.navBrand}>Generador de Guiones</span>
+        <span style={S.navTag}>By @pablojagui · El Arquitecto de Sistemas</span>
+      </div>
+
+      <div style={S.hero}>
+        <p style={S.heroEyebrow}>Contenido viral para profesionales</p>
+        <h1 style={S.heroTitle}>Tu profesión.<br />Tu sistema de contenido.</h1>
+        <p style={S.heroSub}>Selecciona tu profesión, elige tu nicho y genera guiones listos para grabar. El sistema hace el trabajo.</p>
+      </div>
+
+      <div style={S.wrap}>
+
+        <span style={S.sectionTitle}>Acceso · API Key de Anthropic</span>
+        <div style={S.apiRow}>
+          <span style={S.apiLabel}>API Key</span>
+          <input
+            type="password"
+            style={S.apiInput}
+            placeholder="sk-ant-..."
+            value={apiKey}
+            onChange={e => setApiKey(e.target.value)}
+          />
+          <span style={apiValid ? S.apiOk : S.apiNo}>
+            {apiValid ? "✓ Lista" : apiKey.length > 0 ? "Formato incorrecto" : "Sin clave"}
+          </span>
+        </div>
+
+        <span style={S.sectionTitle}>01 — Selecciona tu profesión</span>
+        <div style={S.profGrid}>
+          {PROFESIONES.map(p => (
+            <div
+              key={p.id}
+              style={S.profCard(profId === p.id, p.accent)}
+              onClick={() => selectProf(p.id)}
+            >
+              <span style={S.profEmoji}>{p.emoji}</span>
+              <div style={S.profName(profId === p.id)}>{p.nombre}</div>
+              <div style={S.profCat(profId === p.id)}>{p.categoria}</div>
+            </div>
+          ))}
+        </div>
+
+        {prof && (
+          <>
+            <span style={S.sectionTitle}>02 — Elige tu nicho de contenido</span>
+            <div style={S.nichoGrid}>
+              {prof.nichos.map((n, i) => (
+                <div
+                  key={i}
+                  style={S.nichoCard(nichoIdx === i, prof.accent)}
+                  onClick={() => selectNicho(i)}
+                >
+                  <div style={S.nichoLabel(nichoIdx === i)}>{n.label}</div>
+                  <div style={S.nichoDesc(nichoIdx === i)}>{n.desc}</div>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+
+        {nicho && (
+          <>
+            <span style={S.sectionTitle}>03 — Configura tu guión</span>
+            <div style={S.formPanel}>
+              <div style={S.formGrid2}>
+                <div>
+                  <label style={S.label}>Tipo de contenido</label>
+                  <select style={S.select} value={contentType} onChange={e => setContentType(e.target.value)}>
+                    <option value="reel">Reel / TikTok</option>
+                    <option value="carrusel">Carrusel Instagram</option>
+                    <option value="ambos">Reel + Carrusel</option>
+                  </select>
+                </div>
+                <div>
+                  <label style={S.label}>Pilar de contenido</label>
+                  <select style={S.select} value={pillar} onChange={e => setPillar(e.target.value)}>
+                    <option value="atraccion">Atracción (viral)</option>
+                    <option value="nutricion">Nutrición (autoridad)</option>
+                    <option value="conversion">Conversión (ventas)</option>
+                  </select>
+                </div>
+              </div>
+              <label style={S.label}>Tema específico a desarrollar</label>
+              <input
+                type="text"
+                style={S.topicInput}
+                placeholder="Describe el ángulo exacto que quieres abordar..."
+                value={topic}
+                onChange={e => setTopic(e.target.value)}
+              />
+              <button style={S.genBtn(loading)} onClick={generate} disabled={loading}>
+                {loading ? "Generando guión..." : "Generar guión"}
+              </button>
+              {loading && <div style={S.loadBar} />}
+              {error && <div style={S.errBox}>⚠ {error}</div>}
+            </div>
+          </>
+        )}
+
+        {result && resultMeta && (
+          <div style={S.outputWrap}>
+            <div style={S.outputTop}>
+              <div style={S.outputHeadLeft}>
+                <p style={S.outputEyebrow}>{prof?.nombre} · {resultMeta.nichoLabel}</p>
+                <h2 style={S.outputTitle}>Guión generado</h2>
+              </div>
+              <button style={S.copyAllBtn} onClick={copyAll}>
+                {copiedAll ? "✓ Copiado" : "Copiar todo"}
+              </button>
+            </div>
+            <ResultCard num="01" title="Hook Viral" content={result.hook} accent={resultMeta.accent} />
+            <ResultCard num="02" title="Guión del Reel" content={result.guion} accent={resultMeta.accent} />
+            <ResultCard num="03" title="Visión Visual" content={result.vision_visual} accent={resultMeta.accent} />
+            <ResultCard num="04" title="Versión Carrusel"
+              content={Array.isArray(result.carrusel) ? result.carrusel.map((s, i) => `SLIDE ${i + 1}:\n${s}`).join("\n\n") : result.carrusel}
+              accent={resultMeta.accent}
+            />
+            <ResultCard num="05" title="Caption + CTA" content={result.caption} accent={resultMeta.accent} />
+          </div>
+        )}
+
+        <div style={S.histWrap}>
+          <div style={S.histTop}>
+            <span style={S.histH}>Historial</span>
+            <button style={S.clrBtn} onClick={() => setHistorial([])}>Limpiar</button>
+          </div>
+          {historial.length === 0
+            ? <div style={S.histEmpty}>Aún no has generado guiones — el historial aparecerá aquí</div>
+            : historial.map(entry => (
+              <div key={entry.id} style={S.histItem} onClick={() => loadHist(entry)}>
+                <div style={S.histLeft}>
+                  <span style={S.histBadge(entry.accent)}>{entry.profNombre}</span>
+                  <span style={S.histTopic}>{entry.topic}</span>
+                </div>
+                <span style={S.histTime}>{entry.date} · {entry.time}</span>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+
+      <div style={S.footer}>
+        <p style={S.footerText}>Sistema creado por @pablojagui · El Arquitecto de Sistemas</p>
+      </div>
+    </div>
+  );
+}
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
 </body>
 </html>
